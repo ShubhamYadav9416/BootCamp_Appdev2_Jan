@@ -1,0 +1,13 @@
+Flask
+Flask-SQLAlchemy==3.0.2
+flask-security-too
+email_validator
+bcrypt
+flask_restful
+flask_cors
+flask-jwt-extended
+redis
+celery[redis]
+Flask-Caching
+jinja2
+weasyprint==52.5
