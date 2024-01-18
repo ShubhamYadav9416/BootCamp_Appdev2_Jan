@@ -1,9 +1,17 @@
-from flask import Flask
+# Importing essential libraies--------------------------------
+import os
+import secrets
+from flask import Flask, current_app
+from flask_jwt_extended import JWTManager
 from flask_restful import Resource, Api
-
+from flask_cors import CORS
+from werkzeug.security import generate_password_hash
+from celery.schedules import crontab
+from werkzeug.security import generate_password_hash
 
 from application.data.database import db
 from application.data.model import *
+from application.security import security, user_datastore
 import application.config as config
 
 
@@ -12,15 +20,41 @@ from application.apis.book.bookApi import BookAPI
 
 
 
-
 app = Flask(__name__, template_folder= "./templates")
 app.config.from_object(config)
 app.app_context().push()
+
+
+#  Flask CORS
+CORS(app, supports_credentials=True)
+
+# Add CORS headers to every response
+@app.after_request
+def add_cors_header(response):
+    response.headers['Access-Control-Allow-Origin'] = "http://localhost:8080"
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, PUT, POST, DELETE'
+
+    return response
+
+@app.after_request
+def after_request(response):
+    response = add_cors_header(response)
+    return response
+
+
+
 
 db.init_app(app)
 
 api = Api(app)
 api.init_app(app)
+
+
+JWTManager(app)
+
+
+security.init_app(app, user_datastore)
 
 api.add_resource(AllBookAPI, "/api/book")
 api.add_resource(BookAPI, "/api/book/<int:book_id>")
