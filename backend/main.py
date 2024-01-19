@@ -17,6 +17,9 @@ import application.config as config
 
 from application.apis.book.bookApi import AllBookAPI
 from application.apis.book.bookApi import BookAPI
+from application.apis.auth.loginAPI import LoginAPI
+from application.apis.auth.loginAPI import RefreshTokenAPI
+from application.apis.auth.registerAPI import RegisterAPI
 
 
 
@@ -30,16 +33,16 @@ CORS(app, supports_credentials=True)
 
 # Add CORS headers to every response
 @app.after_request
-def add_cors_header(response):
-    response.headers['Access-Control-Allow-Origin'] = "http://localhost:8080"
+def add_cors_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:8080'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-    response.headers['Access-Control-Allow-Methods'] = 'GET, PUT, POST, DELETE'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, PUT, POST, DELETE, OPTIONS'
 
     return response
 
 @app.after_request
 def after_request(response):
-    response = add_cors_header(response)
+    response = add_cors_headers(response)
     return response
 
 
@@ -58,6 +61,11 @@ security.init_app(app, user_datastore)
 
 api.add_resource(AllBookAPI, "/api/book")
 api.add_resource(BookAPI, "/api/book/<int:book_id>")
+
+api.add_resource(RegisterAPI, "/api/register")
+api.add_resource(LoginAPI,'/api/login')
+
+api.add_resource(RefreshTokenAPI,"/api/refresh_token")
 
 # def new_librarian():
 
